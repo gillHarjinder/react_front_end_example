@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 import { Consumer } from '../../context';
 
@@ -17,9 +19,17 @@ class Contact extends Component {
   };
 
   // this is to use X to delete
-  onDeleteClick = (id, dispatch) => {
+  onDeleteClick = async (id, dispatch) => {
     // calling dispatch 
-    dispatch({type: 'DELETE_CONTACT', payload: id});
+    // Thir try catch is BAD habit becasue it DELETing the Contact
+    // which we ADD no matter what NEVER DO IN REAL LIFE Example
+    try{
+      await axios.delete(`https://jsonplaceholder.typicode.com/users/${id}`);
+
+      dispatch({ type: 'DELETE_CONTACT', payload: id });
+    } catch (e) {
+      dispatch({ type: 'DELETE_CONTACT', payload: id });
+    }
   };
 
   render() {
@@ -38,6 +48,16 @@ class Contact extends Component {
               <h4>{name}
                 <i onClick={this.onShowClick} className="fas fa-sort-down" style={{ cursor: 'pointer' }}></i>
                 <i className="fas fa-times" style={{ cursor: 'pointer', float: 'right', color: 'red' }} onClick={this.onDeleteClick.bind(this, id, dispatch)}></i>
+                <Link to={`contact/edit/${id}`}>
+                <i className="fas fa-pencil-alt"
+                    style={{
+                      cursor: 'pointer',
+                      float: 'right',
+                      color: 'black',
+                      marginRight: '1rem'
+                    }}
+                ></i>
+                </Link>
               </h4>
               {showContactInfo ? (
                 <ul className="list-group">
